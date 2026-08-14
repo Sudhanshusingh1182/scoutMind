@@ -1,0 +1,28 @@
+# ScoutMind Backend Dependencies
+
+# FastAPI
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+websockets==14.2
+python-multipart==0.0.20
+
+# AI / Workflow
+langgraph==0.2.60
+
+# Configuration
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# HTTP Client (for LLM providers + Tavily)
+httpx==0.28.1
+
+# Database
+SQLAlchemy==2.0.36
+PyMySQL==1.1.1
+alembic==1.18.5
+
+# Auth
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.5.0
+authlib==1.7.2
+email-validator==2.3.0

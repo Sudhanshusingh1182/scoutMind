@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Environment (SENSITIVE - never commit)
+.env
+.env.local
+.env.*.local
+*.env
+.env.production
+.env.development
+.env.staging
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Python
+backend/venv/
+backend/.venv/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Docker
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# Secrets & credentials (additional safety net)
+*.pem
+*.key
+*.cert
+credentials.json
+service-account*.json
+
+# Misc
+*.bak
+*.tmp
+.cache/
