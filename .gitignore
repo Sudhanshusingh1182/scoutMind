@@ -58,3 +58,6 @@ service-account*.json
 *.bak
 *.tmp
 .cache/
+
+.next/
+*.tsbuildinfo
