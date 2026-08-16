@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 from fastapi import APIRouter, HTTPException, Depends, Query, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from typing import Optional

@@ -1,4 +1,3 @@
-import uuid
 import threading
 import logging
 from typing import Optional
