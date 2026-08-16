@@ -10,7 +10,7 @@ import type { ReportData, Investigation, ProjectIdea } from "@/lib/types";
 import Header from "@/components/layout/header";
 import {
   IconFileText, IconArrowLeft, IconPlus, IconBulb, IconTarget,
-  IconBuildingStore, IconUsers, IconStar, IconTrophy, IconAlertTriangle,
+  IconBuildingStore, IconUsers, IconTrophy, IconAlertTriangle,
   IconCircleCheck, IconSearch, IconDownload,
 } from "@tabler/icons-react";
 
@@ -245,19 +245,6 @@ export default function ReportPage() {
         }
       };
 
-      const addTitle = (text: string, size: number) => {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(size);
-        doc.setTextColor(30, 30, 30);
-        const lines = doc.splitTextToSize(text, CONTENT_W);
-        checkPage(lines.length * (size * 0.45));
-        lines.forEach((line: string) => {
-          doc.text(line, MARGIN, y);
-          y += size * 0.45;
-        });
-        y += 3;
-      };
-
       const addSectionTitle = (text: string) => {
         checkPage(16);
         y += 4;
@@ -298,28 +285,6 @@ export default function ReportPage() {
           y += 4.5;
         });
         y += 1;
-      };
-
-      const addKeyValue = (key: string, value: string) => {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9);
-        doc.setTextColor(100, 100, 100);
-        const keyLines = doc.splitTextToSize(key, CONTENT_W - 4);
-        checkPage(keyLines.length * 4 + 6);
-        keyLines.forEach((line: string) => {
-          doc.text(line, MARGIN + 2, y);
-          y += 4;
-        });
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(50, 50, 50);
-        const valLines = doc.splitTextToSize(value, CONTENT_W - 4);
-        valLines.forEach((line: string) => {
-          checkPage(4.5);
-          doc.text(line, MARGIN + 2, y);
-          y += 4.5;
-        });
-        y += 2;
       };
 
       const addCard = (title: string, fields: [string, string][]) => {

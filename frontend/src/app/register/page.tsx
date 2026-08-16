@@ -17,6 +17,7 @@ export default function RegisterPage() {
   const initializedRef = useRef(false);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((window as any).google?.accounts?.id) {
       initGoogle();
       return;
@@ -27,17 +28,19 @@ export default function RegisterPage() {
     script.defer = true;
     script.onload = initGoogle;
     document.head.appendChild(script);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function initGoogle() {
     if (initializedRef.current) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const g = (window as any).google?.accounts?.id;
     if (!g || !googleBtnRef.current) return;
     g.initialize({
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      callback: async (response: any) => {
+      callback: async (response: { credential?: string }) => {
         try {
-          await googleLogin(response.credential);
+          if (response.credential) await googleLogin(response.credential);
           router.push("/dashboard");
         } catch (err: unknown) {
           setError(err instanceof Error ? err.message : "Google sign-up failed");

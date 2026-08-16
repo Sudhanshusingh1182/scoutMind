@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import ReportRevealPanel from "./ReportRevealPanel";
 
-const EVENT_CONFIG: Record<string, { icon: React.ComponentType<any>; label: string; color: string }> = {
+const EVENT_CONFIG: Record<string, { icon: React.ComponentType<{ size?: number }>; label: string; color: string }> = {
   investigation_started: { icon: Play, label: "Investigation Started", color: "var(--brand-orange)" },
   questions_generated: { icon: HelpCircle, label: "Questions Generated", color: "#8B5CF6" },
   search_completed: { icon: Search, label: "Search Complete", color: "#F59E0B" },

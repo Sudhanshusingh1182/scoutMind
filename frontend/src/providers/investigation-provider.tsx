@@ -62,6 +62,7 @@ export function InvestigationProvider({
     market_gaps: 0,
     project_ideas: 0,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [report, setReport] = useState<ReportData | null>(null);
   const [reportSections, setReportSections] = useState<Record<string, unknown>>({});
   const wsRef = useRef<WebSocket | null>(null);
