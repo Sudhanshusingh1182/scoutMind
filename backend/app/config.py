@@ -28,6 +28,7 @@ class Settings(BaseSettings):
 
     # Google OAuth
     google_client_id: str = ""
+    google_client_secret: str = ""
 
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
