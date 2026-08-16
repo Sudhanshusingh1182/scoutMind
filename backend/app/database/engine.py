@@ -1,5 +1,8 @@
+import pymysql
+pymysql.install_as_MySQLdb()
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker
 
 from app.config import get_settings
 
