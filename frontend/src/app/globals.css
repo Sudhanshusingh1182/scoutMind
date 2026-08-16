@@ -2373,6 +2373,15 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--brand-orange);
 }
 
+.google-btn-container {
+  display: flex;
+  justify-content: center;
+}
+.google-btn-container iframe {
+  border-radius: var(--radius-sm) !important;
+  overflow: hidden;
+}
+
 .auth-footer {
   text-align: center;
   margin-top: 24px;
