@@ -47,4 +47,7 @@ services:
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
+    buildArgs:
+      NEXT_PUBLIC_API_URL: https://scoutmind-backend.onrender.com
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: 1040621167690-u4281r0jkkbngndqncsor6cb9cg06sqo.apps.googleusercontent.com
     autoDeploy: true
