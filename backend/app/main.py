@@ -2,6 +2,7 @@ import logging
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import get_settings
 from app.api.router import router as api_router
 from app.websocket_manager import ws_manager
 from app.auth.jwt import decode_access_token
@@ -12,21 +13,33 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+settings = get_settings()
+
 app = FastAPI(
     title="ScoutMind API",
     description="AI Project Opportunity Discovery Engine",
     version="4.0.0",
 )
 
+cors_origins = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(api_router)
+
+
+@app.on_event("startup")
+def create_tables():
+    import app.models  # noqa: F401 — ensures all models are registered with Base
+    from app.database.engine import engine
+    from app.database.base import Base
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables ensured")
 
 
 @app.get("/health")

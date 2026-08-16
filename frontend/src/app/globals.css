@@ -1485,6 +1485,44 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   gap: 16px;
 }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+}
+.modal-cancel-btn {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.modal-cancel-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+}
+.modal-delete-btn {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-error);
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.modal-delete-btn:hover {
+  background: #DC2626;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+}
 .modal-block {
   display: flex;
   flex-direction: column;
@@ -2195,6 +2233,27 @@ h1, h2, h3, h4, h5, h6 {
   color: #0a0a0a;
   border-color: var(--brand-orange);
   background: var(--brand-orange);
+}
+.export-pdf-btn {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.export-pdf-btn:hover {
+  color: var(--brand-orange);
+  border-color: var(--border-orange);
+  background: rgba(255, 138, 0, 0.06);
+}
+.export-pdf-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ============================================

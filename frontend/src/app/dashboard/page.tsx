@@ -72,7 +72,7 @@ function DeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel:
             Warning: This deletes all research, sources, and ideas associated with this investigation.
           </div>
         </div>
-        <div className="modal-actions mt-6 flex justify-end gap-3">
+        <div className="modal-actions">
           <button className="modal-cancel-btn" onClick={onCancel}>Cancel</button>
           <button className="modal-delete-btn" onClick={onConfirm}>
             Delete

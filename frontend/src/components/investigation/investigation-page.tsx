@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   XCircle, Loader2, ListChecks, FileText, Activity,
 } from "lucide-react";
+import ScoutMindLogo from "@/components/layout/scoutmind-logo";
 import StepOutput from "./StepOutput";
 import LiveActivityFeed from "./LiveActivityFeed";
 
@@ -256,7 +257,7 @@ function InvestigationContent({ investigationId }: { investigationId: string }) 
       <header className="dash-topbar">
         <div className="dash-brand">
           <Link href="/" className="header-logo">
-            <div className="header-logo-icon">S</div>
+            <ScoutMindLogo size={32} />
             <span>Scout<span className="text-gradient-orange">Mind</span></span>
           </Link>
         </div>

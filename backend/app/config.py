@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
 
+    # CORS
+    cors_origins: str = "http://localhost:3000"
+
     max_research_questions: int = 5
     max_search_results: int = 5
     max_insights: int = 5
@@ -48,7 +51,7 @@ class Settings(BaseSettings):
     evidence_relevance_min: float = 0.5
 
     class Config:
-        env_file = os.getenv("SCOUTMIND_ENV_FILE", str(Path(__file__).resolve().parent.parent.parent / ".env"))
+        env_file = os.getenv("SCOUTMIND_ENV_FILE", str(Path(__file__).resolve().parent.parent / ".env"))
         env_file_encoding = "utf-8"
         extra = "ignore"
 

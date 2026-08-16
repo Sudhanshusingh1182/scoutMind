@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -11,7 +11,7 @@ import Header from "@/components/layout/header";
 import {
   IconFileText, IconArrowLeft, IconPlus, IconBulb, IconTarget,
   IconBuildingStore, IconUsers, IconStar, IconTrophy, IconAlertTriangle,
-  IconCircleCheck, IconSearch,
+  IconCircleCheck, IconSearch, IconDownload,
 } from "@tabler/icons-react";
 
 function escapeHtml(text: string): string {
@@ -179,7 +179,9 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState("summary");
+  const [exporting, setExporting] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement>>({});
+  const reportContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -224,6 +226,286 @@ export default function ReportPage() {
   const scrollToSection = (id: string) => {
     sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const handleExportPdf = useCallback(async () => {
+    if (!report || exporting) return;
+    setExporting(true);
+    try {
+      const { jsPDF } = await import("jspdf");
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
+      const W = doc.internal.pageSize.getWidth();
+      const MARGIN = 20;
+      const CONTENT_W = W - MARGIN * 2;
+      let y = MARGIN;
+
+      const checkPage = (needed: number) => {
+        if (y + needed > doc.internal.pageSize.getHeight() - MARGIN) {
+          doc.addPage();
+          y = MARGIN;
+        }
+      };
+
+      const addTitle = (text: string, size: number) => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(size);
+        doc.setTextColor(30, 30, 30);
+        const lines = doc.splitTextToSize(text, CONTENT_W);
+        checkPage(lines.length * (size * 0.45));
+        lines.forEach((line: string) => {
+          doc.text(line, MARGIN, y);
+          y += size * 0.45;
+        });
+        y += 3;
+      };
+
+      const addSectionTitle = (text: string) => {
+        checkPage(16);
+        y += 4;
+        doc.setDrawColor(255, 138, 0);
+        doc.setLineWidth(0.6);
+        doc.line(MARGIN, y, MARGIN + 30, y);
+        y += 6;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(13);
+        doc.setTextColor(30, 30, 30);
+        doc.text(text, MARGIN, y);
+        y += 8;
+      };
+
+      const addBody = (text: string) => {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        const lines = doc.splitTextToSize(text, CONTENT_W);
+        lines.forEach((line: string) => {
+          checkPage(5);
+          doc.text(line, MARGIN, y);
+          y += 4.5;
+        });
+        y += 2;
+      };
+
+      const addBullet = (text: string) => {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        const lines = doc.splitTextToSize(text, CONTENT_W - 6);
+        checkPage(5);
+        doc.circle(MARGIN + 1.5, y - 1, 0.8, "F");
+        lines.forEach((line: string) => {
+          checkPage(5);
+          doc.text(line, MARGIN + 5, y);
+          y += 4.5;
+        });
+        y += 1;
+      };
+
+      const addKeyValue = (key: string, value: string) => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        const keyLines = doc.splitTextToSize(key, CONTENT_W - 4);
+        checkPage(keyLines.length * 4 + 6);
+        keyLines.forEach((line: string) => {
+          doc.text(line, MARGIN + 2, y);
+          y += 4;
+        });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(50, 50, 50);
+        const valLines = doc.splitTextToSize(value, CONTENT_W - 4);
+        valLines.forEach((line: string) => {
+          checkPage(4.5);
+          doc.text(line, MARGIN + 2, y);
+          y += 4.5;
+        });
+        y += 2;
+      };
+
+      const addCard = (title: string, fields: [string, string][]) => {
+        const filtered = fields.filter(([, v]) => v);
+        if (filtered.length === 0) return;
+
+        let totalLines = 2;
+        filtered.forEach(([, v]) => {
+          totalLines += 1;
+          totalLines += doc.splitTextToSize(v, CONTENT_W - 10).length;
+        });
+        const cardH = totalLines * 4.2 + 12;
+
+        checkPage(cardH);
+
+        const cardY = y;
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(MARGIN, cardY, CONTENT_W, cardH, 2, 2, "F");
+
+        y += 5;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(30, 30, 30);
+        const titleLines = doc.splitTextToSize(title, CONTENT_W - 10);
+        titleLines.forEach((line: string) => {
+          doc.text(line, MARGIN + 4, y);
+          y += 4.2;
+        });
+        y += 2;
+
+        filtered.forEach(([k, v]) => {
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(8);
+          doc.setTextColor(120, 120, 120);
+          doc.text(k.toUpperCase(), MARGIN + 4, y);
+          y += 4;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9.5);
+          doc.setTextColor(50, 50, 50);
+          const valLines = doc.splitTextToSize(v, CONTENT_W - 10);
+          valLines.forEach((line: string) => {
+            doc.text(line, MARGIN + 4, y);
+            y += 4.2;
+          });
+          y += 2;
+        });
+        y += 4;
+      };
+
+      // ── Cover ──
+      y = 50;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(24);
+      doc.setTextColor(30, 30, 30);
+      const titleLines = doc.splitTextToSize(investigation?.problem_statement || "ScoutMind Report", CONTENT_W);
+      titleLines.forEach((line: string) => {
+        doc.text(line, MARGIN, y);
+        y += 10;
+      });
+      y += 8;
+      doc.setDrawColor(255, 138, 0);
+      doc.setLineWidth(1);
+      doc.line(MARGIN, y, MARGIN + 40, y);
+      y += 10;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(120, 120, 120);
+      doc.text("ScoutMind — Autonomous Research Report", MARGIN, y);
+      y += 7;
+      doc.setFontSize(9);
+      doc.text(`Generated: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`, MARGIN, y);
+
+      // ── Executive Summary ──
+      if (report.spark_summary) {
+        doc.addPage();
+        y = MARGIN;
+        addSectionTitle("Executive Summary");
+        addBody(report.spark_summary);
+      }
+
+      // ── Research Findings ──
+      if (report.research_findings && report.research_findings.length > 0) {
+        addSectionTitle("Research Telemetry");
+        report.research_findings.forEach((f) => {
+          addBullet(typeof f === "string" ? f : JSON.stringify(f));
+        });
+      }
+
+      // ── Pain Points ──
+      if (report.key_pain_points && report.key_pain_points.length > 0) {
+        addSectionTitle("Critical Pain Points");
+        report.key_pain_points.forEach((pp) => {
+          addCard(pp.description, [
+            ["Severity", pp.severity],
+            ["Frequency", pp.frequency],
+            ["Affected Users", pp.affected_users],
+          ]);
+        });
+      }
+
+      // ── Root Causes ──
+      if (report.root_cause_analysis && report.root_cause_analysis.length > 0) {
+        addSectionTitle("Root Causes");
+        report.root_cause_analysis.forEach((rc) => {
+          addCard(rc.root_cause, [
+            ["Depth", `${rc.depth}/3`],
+            ["Explanation", rc.explanation],
+          ]);
+        });
+      }
+
+      // ── Competitor Matrix ──
+      if (report.existing_solutions && report.existing_solutions.length > 0) {
+        addSectionTitle("Competitor Matrix");
+        report.existing_solutions.forEach((sol) => {
+          addCard(sol.name, [
+            ["Category", sol.category],
+            ["Strengths", sol.strengths],
+            ["Weaknesses", sol.weaknesses],
+            ["Missing Features", sol.missing_features],
+          ]);
+        });
+      }
+
+      // ── Market Gaps ──
+      if (report.market_gaps && report.market_gaps.length > 0) {
+        addSectionTitle("Open Market Gaps");
+        report.market_gaps.forEach((gap) => {
+          addCard(gap.description, [
+            ["Underserved Users", gap.underserved_users],
+            ["Opportunity Type", gap.opportunity_type],
+            ["Potential", gap.potential],
+            ["Why Now", gap.why_now],
+          ]);
+        });
+      }
+
+      // ── Strategic Recommendation ──
+      if (report.recommended_project || report.suggested_mvp) {
+        addSectionTitle("Strategic Concept");
+        if (report.recommended_project) addBody(report.recommended_project);
+        if (report.suggested_mvp) addBody(report.suggested_mvp);
+      }
+
+      // ── Ranked Opportunities ──
+      if (report.project_ideas && report.project_ideas.length > 0) {
+        addSectionTitle("Ranked Opportunities");
+        report.project_ideas.forEach((idea, i) => {
+          const scoreText = `Overall: ${idea.overall_score.toFixed(1)}/10`;
+          addCard(`#${i + 1} — ${idea.title}`, [
+            ["Category", idea.category],
+            ["Score", scoreText],
+            ["Elevator Pitch", idea.elevator_pitch],
+            ["Problem Solved", idea.problem_solved],
+            ["Target Users", idea.target_users],
+            ["Why Now", idea.why_now],
+            ["MVP Scope", idea.mvp_outline],
+            ["Future Expansion", idea.future_expansion],
+            ["Pricing Model", idea.pricing_model],
+          ]);
+        });
+      }
+
+      // ── Risks ──
+      if (report.risks && report.risks.length > 0) {
+        addSectionTitle("Identified Risks");
+        report.risks.forEach((risk) => addBullet(risk));
+      }
+
+      // ── References ──
+      if (report.references && report.references.length > 0) {
+        addSectionTitle("Source References");
+        report.references.forEach((ref) => {
+          addBullet(`${ref.title || ref.url}${ref.url ? ` — ${ref.url}` : ""}`);
+        });
+      }
+
+      const filename = `ScoutMind-Report-${investigationId.slice(0, 8)}.pdf`;
+      doc.save(filename);
+    } catch (err) {
+      console.error("PDF export failed:", err);
+      alert("PDF export failed. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  }, [report, exporting, investigationId, investigation]);
 
   if (loading) {
     return (
@@ -378,7 +660,7 @@ export default function ReportPage() {
           initial="hidden"
           animate="visible"
         >
-          <div className="report-container">
+          <div className="report-container" ref={reportContentRef}>
             <motion.div className="report-header pb-8 border-b border-[var(--border-subtle)]" variants={itemVariants}>
               <div className="report-header-badge inline-flex items-center gap-2">
                 <IconFileText size={12} />
@@ -390,10 +672,14 @@ export default function ReportPage() {
               
               <div className="report-meta flex items-center gap-3 text-xs text-[var(--text-secondary)] font-medium mt-4">
                 <span>{report.project_ideas?.length || 0} opportunity designs</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-faint)]" />
-                <span>{report.research_findings?.length || 0} telemetry paths</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-faint)]" />
-                <span>{report.existing_solutions?.length || 0} competitors resolved</span>
+                <button
+                  onClick={handleExportPdf}
+                  disabled={exporting}
+                  className="export-pdf-btn inline-flex items-center gap-1.5 ml-auto"
+                >
+                  <IconDownload size={13} className={exporting ? "animate-bounce" : ""} />
+                  <span>{exporting ? "Exporting..." : "Export PDF"}</span>
+                </button>
               </div>
             </motion.div>
 

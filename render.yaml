@@ -1,0 +1,55 @@
+services:
+  # ── Backend (FastAPI) ──
+  - type: web
+    name: scoutmind-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: BACKEND_HOST
+        value: 0.0.0.0
+      - key: BACKEND_PORT
+        value: 8000
+      - key: LLM_PLANNER
+        value: openrouter
+      - key: LLM_INSIGHTS
+        value: openrouter
+      - key: LLM_OPPORTUNITIES
+        value: openrouter
+      - key: LLM_STARTUPS
+        value: openrouter
+      - key: LLM_REPORT
+        value: openrouter
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # ── Frontend (Next.js) ──
+  - type: web
+    name: scoutmind-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      - key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
+        sync: false
+    autoDeploy: true

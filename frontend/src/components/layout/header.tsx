@@ -3,11 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import ScoutMindLogo from "./scoutmind-logo";
 
 export default function Header() {
   const { user, logout } = useAuth();
 
-  // Get user initials for avatar representation
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -20,7 +20,7 @@ export default function Header() {
   return (
     <header className="header glass-panel">
       <Link href="/" className="header-logo">
-        <div className="header-logo-icon">S</div>
+        <ScoutMindLogo size={32} />
         <span>Scout<span className="text-gradient-orange">Mind</span></span>
       </Link>
       <nav className="header-nav">

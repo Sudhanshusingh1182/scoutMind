@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "ScoutMind — AI Project Opportunity Discovery Engine",
   description:
     "Describe a frustration. ScoutMind investigates it with autonomous AI agents, discovers root causes and market gaps, and generates evidence-backed project ideas worth building.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
